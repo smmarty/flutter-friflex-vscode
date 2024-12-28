@@ -1,0 +1,129 @@
+{
+  "name": "flutter-friflex",
+  "displayName": "Flutter Friflex",
+  "description": "A plugin for Flutter developers at Friflex, an IT company",
+  "version": "0.0.1",
+  "publisher": "friflex",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "bugs": {
+    "url": "https://github.com/smmarty/flutter-friflex-vscode/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/smmarty/flutter-friflex-vscode"
+  },
+  "keywords": [
+    "flutter",
+    "dart"
+  ],
+  "author": {
+    "name": "Petrov Yura"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets",
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "properties": {
+        "flutter-friflex.addPrefixI": {
+          "type": "boolean",
+          "default": true,
+          "description": "Add prefix 'I' to interfaces"
+        },
+        "flutter-friflex.entityWithEquatable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Use Entity with Equatable"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "extension.createFeatureFolders",
+        "title": "Friflex: Create Feature Folders"
+      },
+      {
+        "command": "extension.createEntity",
+        "title": "Create Entity"
+      },
+      {
+        "command": "extension.createStatelessWidget",
+        "title": "Create StatelessWidget"
+      },
+      {
+        "command": "extension.createStatefulWidget",
+        "title": "Create StatefulWidget"
+      }
+    ],
+    "submenus": [
+      {
+        "id": "flutter-friflex.subMenu",
+        "label": "Friflex",
+        "group": "friflex_group"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "extension.createFeatureFolders",
+          "when": "explorerResourceIsFolder",
+          "group": "friflex"
+        }
+      ],
+      "editor/context": [
+        {
+          "group": "friflex_group",
+          "submenu": "flutter-friflex.subMenu",
+          "when": "resourceExtname == .dart"
+        }
+      ],
+      "flutter-friflex.subMenu": [
+        {
+          "command": "extension.createEntity",
+          "group": "ext@1"
+        },
+        {
+          "command": "extension.createStatelessWidget",
+          "group": "ext@2"
+        },
+        {
+          "command": "extension.createStatefulWidget",
+          "group": "ext@3"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.96.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@typescript-eslint/eslint-plugin": "^8.17.0",
+    "@typescript-eslint/parser": "^8.17.0",
+    "eslint": "^9.16.0",
+    "typescript": "^5.7.2",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1"
+  },
+  "icon": "assets/logo.png",
+  "galleryBanner": {
+    "color": "#C80000",
+    "theme": "dark"
+  }
+}

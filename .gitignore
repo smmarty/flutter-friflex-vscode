@@ -1,0 +1,25 @@
+# Node.js зависимости
+node_modules/
+package-lock.json
+
+# Временные файлы
+tmp/
+temp/
+
+# Файлы тестов и отчёты
+coverage/
+test-results/
+.vscode-test/
+
+# Логи и файлы отладки
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Конфиденциальные файлы и ключи
+.env
+secrets.json
+
+# VS Code настройки
+*.vsix

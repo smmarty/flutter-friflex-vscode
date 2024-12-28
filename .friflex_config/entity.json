@@ -1,0 +1,12 @@
+{
+    "imports": [],
+    "classStructure": [
+        "/// {@template {className}}",
+        "/// ",
+        "/// {@endtemplate}",
+        "class {className} {",
+        "  /// {@macro {className}}",
+        "  const {className}();",
+        "}"
+    ]
+}

@@ -1,0 +1,24 @@
+{
+    "imports": [
+        "import 'package:flutter/widgets.dart';"
+    ],
+    "classStructure": [
+        "/// {@template {className}}",
+        "/// ",
+        "/// {@endtemplate}",
+        "class {className} extends StatefulWidget {",
+        "  /// {@macro {className}}",
+        "  const {className}({super.key});",
+        " ",
+        "  @override",
+        "  State<{className}> createState() => _{className}State();",
+        "}",
+        "",
+        "class _{className}State extends State<{className}> {",
+        "  @override",
+        "  Widget build(BuildContext context) {",
+        "    return Container();",
+        "  }",
+        "}"
+    ]
+}
