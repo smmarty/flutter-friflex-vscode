@@ -1,3 +1,5 @@
+/// Global constants
+
 /// Settings
 export const settingsEntityWithEquatable = 'flutter-friflex.entityWithEquatable';
 export const settingsAddPrefixI = 'flutter-friflex.addPrefixI';
