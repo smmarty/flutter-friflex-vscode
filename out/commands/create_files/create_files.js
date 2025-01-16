@@ -38,6 +38,10 @@ const vscode = __importStar(require("vscode"));
 const create_entity_1 = require("./creators/create_entity");
 const create_widget_1 = require("./creators/create_widget");
 const consts_1 = require("../../consts");
+/**
+ * Registers all commands for creating files with VS Code
+ * @param {vscode.ExtensionContext} context
+ */
 function registerCreateFilesCommands(context) {
     context.subscriptions.push(vscode.commands.registerCommand('extension.createEntity', () => (0, create_entity_1.createEntity)(__dirname)), vscode.commands.registerCommand('extension.createStatelessWidget', () => (0, create_widget_1.createWidget)(__dirname, consts_1.configStatelessWidget)), vscode.commands.registerCommand('extension.createStatefulWidget', () => (0, create_widget_1.createWidget)(__dirname, consts_1.configStatefulWidget)));
 }

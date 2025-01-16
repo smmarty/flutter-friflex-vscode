@@ -1,0 +1,37 @@
+name: Build VSCode Extension
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: [self-hosted, checker]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build extension
+      run: npm run vscode:prepublish
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: vscode-extension
+        path: ./*.vsix
+
+
+    # - name: Publish to VSCode Marketplace
+    #   if: github.event_name == 'release'
+    #   run: npx vsce publish
+    #   env:
+    #     VSCE_PAT: ${{ secrets.VSCE_PAT }}
