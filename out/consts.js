@@ -1,4 +1,5 @@
 "use strict";
+/// Global constants
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.configFolderName = exports.configIFeaturesFolders = exports.configEntityWithEquatable = exports.configStatefulWidget = exports.configStatelessWidget = exports.configEntity = exports.configFeaturesFolders = exports.settingsAddPrefixI = exports.settingsEntityWithEquatable = void 0;
 /// Settings

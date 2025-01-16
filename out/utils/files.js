@@ -43,22 +43,46 @@ const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const vscode = __importStar(require("vscode"));
 const consts_1 = require("../consts");
+/**
+ * Global utility functions
+*/
+/**
+ * Creates the folder if it does not exist.
+ * @param {string} folderPath - A path to the folder to be created.
+ */
 function createFolderIfNotExists(folderPath) {
     if (!fs.existsSync(folderPath)) {
         fs.mkdirSync(folderPath, { recursive: true });
     }
 }
+/**
+ * Creates subfolders in the specified base path if they do not exist.
+ * @param {string} basePath - The base path for the subfolders.
+ * @param {string[]} subFolders - The names of the subfolders to be created.
+ */
 function createSubfolders(basePath, subFolders) {
     subFolders.forEach(sub => {
         const subFolderPath = path.join(basePath, sub);
         createFolderIfNotExists(subFolderPath);
     });
 }
+/**
+ * Creates a file with the specified content if it does not exist.
+ *
+ * @param {string} filePath - The path to the file to be created.
+ * @param {string} content - The content to write into the file if it does not exist.
+ */
 function createFileIfNotExists(filePath, content) {
     if (!fs.existsSync(filePath)) {
         fs.writeFileSync(filePath, content, { encoding: 'utf8' });
     }
 }
+/**
+ * Copies the file from one location to another if the destination path does not exist.
+ * Creates the destination folder if it does not exist.
+ * @param {string} from - The path to the file to be copied.
+ * @param {string} to - The path to the destination file.
+ */
 function copyFileSync(from, to) {
     const toDir = path.dirname(to);
     if (!fs.existsSync(toDir)) {
@@ -66,6 +90,12 @@ function copyFileSync(from, to) {
     }
     fs.copyFileSync(from, to);
 }
+/**
+ * Checks if the configuration file exists in the project's root and copies it
+ * from the default location if it does not exist.
+ * @param {string} dirName - The path to the directory with the default configuration.
+ * @param {string} config - The name of the configuration file.
+ */
 function checkAvailableConfigInFolder(dirName, config) {
     try {
         const rootPath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || process.cwd();
@@ -80,6 +110,11 @@ function checkAvailableConfigInFolder(dirName, config) {
         vscode.window.showErrorMessage(`Error reading the file: ${config}`);
     }
 }
+/**
+ * Converts the last segment of a file path to PascalCase.
+ * @param {string} filePath - The file path to convert.
+ * @returns {string} The PascalCase version of the file name.
+ */
 function convertPathToPascalCase(filePath) {
     const pathSegments = filePath.split(/[\\/]/);
     let fileName = pathSegments[pathSegments.length - 1];

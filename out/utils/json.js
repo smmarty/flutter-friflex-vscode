@@ -39,6 +39,13 @@ const vscode = __importStar(require("vscode"));
 const path = __importStar(require("path"));
 const fs = __importStar(require("fs"));
 const consts_1 = require("../consts");
+/// Global functions for working with json
+/**
+ * Reads the content of a given JSON file in the `.friflex_config` folder as JSON.
+ * @param {string} config - The name of the JSON file.
+ * @returns {Promise<any>} The content of the file as JSON.
+ * @throws {vscode.MessageItem} An error message if the file does not exist or cannot be read.
+ */
 async function readTemplateJson(config) {
     try {
         const rootPath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || process.cwd();
@@ -51,6 +58,14 @@ async function readTemplateJson(config) {
         vscode.window.showErrorMessage(`Error reading the file: ${config}`);
     }
 }
+/**
+ * Generates a class based on the given template and className.
+ * Replaces `{className}` with the given className in the template.
+ * If the template has imports, they are joined with newline and prepended to the class declaration.
+ * @param {any} template - The template to generate the class from.
+ * @param {string} className - The name of the class to generate.
+ * @returns {string} The generated class as a string.
+ */
 function generateClass(template, className) {
     const importsJoined = template.imports.join('\n');
     const classBody = template.classStructure
