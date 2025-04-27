@@ -41,6 +41,19 @@ Friflex/
   ├── Create StatelessWidget
   └── Create StatefulWidget
 ```
+### 3. Add documentation comments to Dart classes
+- Adds documentation comments to Dart classes using the `{@template}` tag.
+- Supports adding comments to constructors with the `{@macro}` tag.
+```plaintext
+Friflex/
+  ├── Add Comments
+```
+
+### 4. Use keyboard shortcuts
+- `Ctrl + Shift + 1` to create an Entity class. 
+- `Ctrl + Shift + 2` to create a StatelessWidget class.
+- `Ctrl + Shift + 3` to create a StatefulWidget class.
+- `Ctrl + Shift + 4` to add comments to a Dart class.
 
 ## Settings
 ### You can change it in the plugin settings:

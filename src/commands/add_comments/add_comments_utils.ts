@@ -18,7 +18,6 @@ export function isConstructor(line: string, className: string): boolean {
     return constructorPattern.test(line);
 }
 
-
 /**
  * Finds class constructors in text and adds comments to them
  * 
@@ -26,17 +25,20 @@ export function isConstructor(line: string, className: string): boolean {
  * @param {string} className - Class name
  * @param {vscode.TextDocument} document - Document
  * @param {vscode.TextEdit[]} edits - Array to store edits
+ * @returns {Promise<void>}
  */
-export function findConstructors(text: string, className: string, document: vscode.TextDocument, edits: vscode.TextEdit[]): void {
+export async function findConstructors(text: string, className: string, document: vscode.TextDocument, edits: vscode.TextEdit[]): Promise<void> {
     // Find all occurrences of the class name
     const lines = text.split('\n');
-
-    for (let i = 0; i < lines.length; i++) {
+    const linesCount = lines.length;
+    
+    // Process in chunks to prevent UI blocking
+    for (let i = 0; i < linesCount; i++) {
         const line = lines[i].trim();
 
-        // Check if the current line is a constructor
+        // Check if this is a constructor
         if (isConstructor(line, className)) {
-            // Check if comments already exist before the constructor
+            // Check for existing comments
             let hasComments = false;
             for (let j = i - 1; j >= Math.max(0, i - 3); j--) {
                 const prevLine = lines[j].trim();
@@ -52,13 +54,19 @@ export function findConstructors(text: string, className: string, document: vsco
 
             // If no comments exist, add them
             if (!hasComments) {
-                // Create constructor comment using {@macro}
+                // Create comment using {@macro}
                 const constructorComment = `  /// {@macro ${className}}\n`;
 
-                // Insert comment into the document
+                // Insert comment into document
                 const insertPosition = new vscode.Position(i, 0);
                 edits.push(vscode.TextEdit.insert(insertPosition, constructorComment));
             }
+        }
+        
+        // Periodically yield control to the main thread
+        // to prevent UI blocking on large files
+        if (i % 500 === 0 && i > 0) {
+            await new Promise(resolve => setTimeout(resolve, 0));
         }
     }
 }

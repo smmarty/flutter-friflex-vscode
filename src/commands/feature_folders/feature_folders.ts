@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import { configFeaturesFolders, configFolderName, configIFeaturesFolders, settingsAddPrefixI } from '../../consts';
 import { camelCaseToSnakeCase, toPascalCase, toSnakeCase } from '../../utils/string';
 import * as fs from 'fs';
+import * as fsPromises from 'fs/promises';
 import { checkAvailableConfigInFolder, createFileIfNotExists, createFolderIfNotExists, FolderStructure } from '../../utils/files';
 
 /**
@@ -42,11 +43,11 @@ export function registerCreateFeatureFoldersCommand(context: vscode.ExtensionCon
         // Get root path
         const rootPath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || process.cwd();
         // Check if config exists
-        addPrefixI ? checkAvailableConfigInFolder(__dirname, configIFeaturesFolders) : checkAvailableConfigInFolder(__dirname, configFeaturesFolders);
+        await checkAvailableConfigInFolder(__dirname, currentConfig);
         // Path to config
         const pathToConfig = path.join(rootPath, `${configFolderName}/${currentConfig}`);
         // Create folder structure
-        createStructureFromJson(pathToConfig, featurePath, featureName);
+        await createStructureFromJson(pathToConfig, featurePath, featureName);
     });
 
 
@@ -59,47 +60,46 @@ export function registerCreateFeatureFoldersCommand(context: vscode.ExtensionCon
      * @param {string} jsonPath - The path to the JSON configuration file.
      * @param {string} basePath - The base path for the folder structure.
      * @param {string} featureName - The name of the feature module.
+     * @returns {Promise<void>}
      */
-    function createStructureFromJson(jsonPath: string, basePath: string, featureName: string): void {
-        // Read the JSON configuration file
-        const config = fs.readFileSync(jsonPath, 'utf8');
-
-        // Parse the JSON string to a FolderStructure object
-        const structure: FolderStructure = JSON.parse(config);
-
-        // Convert the feature name to PascalCase and snake_case
-        const pascalCaseFeatureName = toPascalCase(featureName);
-        const snakeCaseFeatureName = toSnakeCase(featureName);
-
-        // Create the folder structure
+    async function createStructureFromJson(jsonPath: string, basePath: string, featureName: string): Promise<void> {
         try {
-            structure.folders.forEach(folder => {
+            // Read JSON configuration asynchronously
+            const configBuffer = await fsPromises.readFile(jsonPath, 'utf8');
+            
+            // Parse JSON string to FolderStructure
+            const structure: FolderStructure = JSON.parse(configBuffer);
+            
+            // Convert feature name to PascalCase and snake_case
+            const pascalCaseFeatureName = toPascalCase(featureName);
+            const snakeCaseFeatureName = toSnakeCase(featureName);
+            
+            // Create folders structure
+            for (const folder of structure.folders) {
                 const folderPath = path.join(basePath, folder);
-                createFolderIfNotExists(folderPath);
-            });
-        } catch (error) {
-            console.log(error);
-            vscode.window.showErrorMessage(`Error when creating folders: ${error}`);
-        }
-
-        // Create the files
-        try {
-            structure.files.forEach(file => {
+                await createFolderIfNotExists(folderPath);
+            }
+            
+            // Create files
+            for (const file of structure.files) {
                 const filePath = path.join(basePath, file.path.replace(/{file_name}/g, snakeCaseFeatureName));
                 let content = file.content || '';
+                
                 if (file.template) {
                     let className = pascalCaseFeatureName;
                     content = file.template
                         .replace(/{file_name}/g, snakeCaseFeatureName)
                         .replace(/{class_name}/g, className);
                 }
-                createFileIfNotExists(filePath, content);
-            });
+                
+                await createFileIfNotExists(filePath, content);
+            }
         } catch (error) {
             console.log(error);
-            vscode.window.showErrorMessage(`Error when creating files: ${error}`);
+            vscode.window.showErrorMessage(`Error creating folder structure: ${error}`);
         }
     }
+    
     context.subscriptions.push(disposable);
 }
 

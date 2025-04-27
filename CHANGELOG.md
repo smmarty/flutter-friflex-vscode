@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Automatic documentation comments for Dart classes using {@template} tag
 - Support for adding comments to constructors with {@macro} tag
+- Added keyboard shortcuts
 
 ## [0.0.1] - 2025-04-25
 
