@@ -68,6 +68,32 @@
         "title": "Add Class Comments"
       }
     ],
+    "keybindings": [
+      {
+        "command": "extension.createEntity",
+        "key": "ctrl+shift+e",
+        "mac": "cmd+shift+e",
+        "when": "editorTextFocus && resourceExtname == .dart"
+      },
+      {
+        "command": "extension.createStatelessWidget",
+        "key": "ctrl+shift+l",
+        "mac": "cmd+shift+l",
+        "when": "editorTextFocus && resourceExtname == .dart"
+      },
+      {
+        "command": "extension.createStatefulWidget",
+        "key": "ctrl+shift+f",
+        "mac": "cmd+shift+f",
+        "when": "editorTextFocus && resourceExtname == .dart"
+      },
+      {
+        "command": "extension.addClassComments",
+        "key": "ctrl+shift+c",
+        "mac": "cmd+shift+c",
+        "when": "editorTextFocus && resourceExtname == .dart"
+      }
+    ],
     "submenus": [
       {
         "id": "flutter-friflex.subMenu",
