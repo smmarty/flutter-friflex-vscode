@@ -1,63 +1,63 @@
 import * as vscode from 'vscode';
 
 /**
- * Регистрирует команду для добавления комментариев к классам и конструкторам
- * Dart файлов в VS Code.
+ * Registers a command for adding comments to classes and constructors
+ * in Dart files in VS Code.
  * 
- * @param {vscode.ExtensionContext} context - Контекст расширения VS Code
+ * @param {vscode.ExtensionContext} context - VS Code extension context
  */
 export function registerAddClassCommentsCommand(context: vscode.ExtensionContext) {
-    // Регистрация команды для добавления комментариев
+    // Register the comment addition command
     context.subscriptions.push(
         vscode.commands.registerCommand('extension.addClassComments', async () => {
-            // Получение активного редактора
+            // Get active text editor
             const editor = vscode.window.activeTextEditor;
             if (!editor) {
-                vscode.window.showWarningMessage('Нет открытого редактора');
+                vscode.window.showWarningMessage('No active editor found');
                 return;
             }
-            
-            // Проверка, что открыт Dart файл
+
+            // Check if a Dart file is open
             if (editor.document.languageId !== 'dart') {
-                vscode.window.showWarningMessage('Эта команда поддерживается только для Dart файлов');
+                vscode.window.showWarningMessage('This command only works in Dart files');
                 return;
             }
-            
-            // Вызов функции для добавления комментариев
+
+            // Call function to add comments
             await addCommentsToClassAndConstructor(editor);
         }),
     );
 }
 
 /**
- * Добавляет комментарии к классам и конструкторам в текущем Dart файле.
- * Функция анализирует код файла, находит классы и их конструкторы,
- * и добавляет к ним документирующие комментарии, если они отсутствуют.
+ * Adds comments to classes and constructors in the current Dart file.
+ * The function analyzes the file code, finds classes and their constructors,
+ * and adds documentation comments to them if they don't exist yet.
  * 
- * @param {vscode.TextEditor} editor - Активный редактор текста
+ * @param {vscode.TextEditor} editor - Active text editor
  * @returns {Promise<void>}
  */
 async function addCommentsToClassAndConstructor(editor: vscode.TextEditor): Promise<void> {
-    // Получение текста документа
+    // Get document text
     const document = editor.document;
     const text = document.getText();
-    
-    // Регулярное выражение для поиска классов
-    // Ищет класс с возможными модификаторами и наследованием
+
+    // Regular expression for finding classes
+    // Looks for classes with potential modifiers and inheritance
     const classRegex = /(?:abstract\s+|final\s+|sealed\s+|base\s+|interface\s+)*class\s+(\w+)(?:\s+(?:extends|with|implements)[\s\w,<>]+)?\s*\{/g;
-    
-    // Создание массивов для редактирования и имен классов
+
+    // Create arrays for edits and class names
     let match;
     const edits: vscode.TextEdit[] = [];
     const classNames: string[] = [];
-    
-    // Находим все классы в документе
+
+    // Find all classes in the document
     while ((match = classRegex.exec(text)) !== null) {
         const className = match[1];
         const position = document.positionAt(match.index);
         const lineIndex = position.line;
-        
-        // Проверяем, есть ли уже комментарии перед классом
+
+        // Check if comments already exist before the class
         let hasComments = false;
         for (let i = lineIndex - 1; i >= Math.max(0, lineIndex - 3); i--) {
             const line = document.lineAt(i).text.trim();
@@ -65,59 +65,59 @@ async function addCommentsToClassAndConstructor(editor: vscode.TextEditor): Prom
                 hasComments = true;
                 break;
             }
-            // Если встретили непустую строку, но это не комментарий, то выходим
+            // If we encounter a non-empty line that's not a comment, exit
             if (line !== '') {
                 break;
             }
         }
-        
-        // Если комментариев нет, добавляем их
+
+        // If no comments exist, add them
         if (!hasComments) {
-            // Формируем комментарий для класса с использованием {@template}
+            // Create class comment using {@template}
             const classComment = `/// {@template ${className}}\n/// \n/// {@endtemplate}\n`;
             const insertPosition = new vscode.Position(lineIndex, 0);
             edits.push(vscode.TextEdit.insert(insertPosition, classComment));
         }
-        
-        // Сохраняем имя класса для поиска конструкторов
+
+        // Store class name to search for constructors
         classNames.push(className);
     }
-    
-    // Находим конструкторы для всех обнаруженных классов
+
+    // Find constructors for all discovered classes
     for (const className of classNames) {
-        // Ищем все конструкторы класса с помощью улучшенного метода
+        // Find all constructors using the enhanced method
         findConstructors(text, className, document, edits);
     }
-    
-    // Применяем все изменения к документу
+
+    // Apply all changes to the document
     if (edits.length > 0) {
         const workspaceEdit = new vscode.WorkspaceEdit();
         workspaceEdit.set(document.uri, edits);
         await vscode.workspace.applyEdit(workspaceEdit);
-        vscode.window.showInformationMessage('Комментарии успешно добавлены');
+
     } else {
-        vscode.window.showInformationMessage('Не найдено классов или конструкторов для комментирования');
+        vscode.window.showInformationMessage('Comments already exist or no classes found');
     }
 }
 
 /**
- * Находит конструкторы класса в тексте и добавляет к ним комментарии
+ * Finds class constructors in text and adds comments to them
  * 
- * @param {string} text - Текст документа
- * @param {string} className - Имя класса
- * @param {vscode.TextDocument} document - Документ
- * @param {vscode.TextEdit[]} edits - Массив для хранения редактирований
+ * @param {string} text - Document text
+ * @param {string} className - Class name
+ * @param {vscode.TextDocument} document - Document
+ * @param {vscode.TextEdit[]} edits - Array to store edits
  */
 function findConstructors(text: string, className: string, document: vscode.TextDocument, edits: vscode.TextEdit[]): void {
-    // Находим все вхождения имени класса
+    // Find all occurrences of the class name
     const lines = text.split('\n');
-    
+
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i].trim();
-        
-        // Проверяем, является ли текущая строка конструктором
+
+        // Check if the current line is a constructor
         if (isConstructor(line, className)) {
-            // Проверяем, есть ли уже комментарии перед конструктором
+            // Check if comments already exist before the constructor
             let hasComments = false;
             for (let j = i - 1; j >= Math.max(0, i - 3); j--) {
                 const prevLine = lines[j].trim();
@@ -125,18 +125,18 @@ function findConstructors(text: string, className: string, document: vscode.Text
                     hasComments = true;
                     break;
                 }
-                // Если встретили непустую строку, но это не комментарий, то выходим
+                // If we encounter a non-empty line that's not a comment, exit
                 if (prevLine !== '') {
                     break;
                 }
             }
-            
-            // Если комментариев нет, добавляем их
+
+            // If no comments exist, add them
             if (!hasComments) {
-                // Формируем комментарий для конструктора с использованием {@macro}
+                // Create constructor comment using {@macro}
                 const constructorComment = `  /// {@macro ${className}}\n`;
-                
-                // Вставляем комментарий в документ
+
+                // Insert comment into the document
                 const insertPosition = new vscode.Position(i, 0);
                 edits.push(vscode.TextEdit.insert(insertPosition, constructorComment));
             }
@@ -145,19 +145,19 @@ function findConstructors(text: string, className: string, document: vscode.Text
 }
 
 /**
- * Проверяет, является ли строка конструктором класса
+ * Checks if a string is a class constructor
  * 
- * @param {string} line - Строка для проверки
- * @param {string} className - Имя класса
- * @returns {boolean} - true, если строка является конструктором
+ * @param {string} line - Line to check
+ * @param {string} className - Class name
+ * @returns {boolean} - true if the line is a constructor
  */
 function isConstructor(line: string, className: string): boolean {
-    // Паттерн для определения конструктора
-    // - может начинаться с "const", "factory" или ничего
-    // - затем идет имя класса
-    // - затем могут быть модификаторы (.named и т.п.)
-    // - затем скобки с параметрами
-    // - может заканчиваться на { или =>
+    // Pattern for constructor detection
+    // - can start with "const", "factory" or nothing
+    // - followed by the class name
+    // - possible modifiers (.named etc.)
+    // - parentheses with parameters
+    // - can end with {, => or ;
     const constructorPattern = new RegExp(`^\\s*(?:const\\s+|factory\\s+)?${className}(?:\\.\\w+)?\\s*\\(.*\\)(?:\\s*:\\s*.*)?(?:\\s*\\{|\\s*=>|\\s*;)?`);
     return constructorPattern.test(line);
 }
