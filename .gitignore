@@ -23,3 +23,5 @@ secrets.json
 
 # VS Code настройки
 *.vsix
+
+out/
