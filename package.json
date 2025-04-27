@@ -2,7 +2,7 @@
   "name": "flutter-friflex",
   "displayName": "Flutter Friflex",
   "description": "A plugin for Flutter developers at Friflex, an IT company",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "friflex",
   "engines": {
     "vscode": "^1.96.0"
