@@ -20,7 +20,7 @@ export async function createFolderIfNotExists(folderPath: string): Promise<void>
     }
 }
 
-// Синхронная версия для обратной совместимости (где нужно)
+// Synchronous version for backward compatibility (where needed)
 export function createFolderIfNotExistsSync(folderPath: string): void {
     if (!fs.existsSync(folderPath)) {
         fs.mkdirSync(folderPath, { recursive: true });
@@ -55,7 +55,7 @@ export async function createFileIfNotExists(filePath: string, content: string): 
     }
 }
 
-// Синхронная версия для обратной совместимости (где нужно)
+// Synchronous version for backward compatibility (where needed)
 export function createFileIfNotExistsSync(filePath: string, content: string): void {
     if (!fs.existsSync(filePath)) {
         fs.writeFileSync(filePath, content, { encoding: 'utf8' });
@@ -86,7 +86,7 @@ export async function copyFile(from: string, to: string): Promise<void> {
     await fsPromises.copyFile(from, to);
 }
 
-// Синхронная версия для обратной совместимости
+// Synchronous version for backward compatibility (where needed)
 export function copyFileSync(from: string, to: string): void {
     const toDir = path.dirname(to);
     if (!fs.existsSync(toDir)) {
@@ -119,7 +119,7 @@ export async function checkAvailableConfigInFolder(dirName: string, config: stri
     }
 }
 
-// Синхронная версия для обратной совместимости
+// Synchronous version for backward compatibility (where needed)
 export function checkAvailableConfigInFolderSync(dirName: string, config: string): void {
     try {
         const rootPath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || process.cwd();
