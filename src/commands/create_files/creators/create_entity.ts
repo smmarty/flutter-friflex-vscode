@@ -20,55 +20,70 @@ import { generateClass, readTemplateJson } from '../../../utils/json';
  * active text editor at the beginning of the file.
  * @param {string} dirName - The path to the directory with the default configuration.
  */
-// This function is responsible for creating an entity in the specified directory.
-// It checks the configuration for whether the entity should use the "Equatable" package
-// and generates code based on a template, inserting it into the currently active editor.
-
 export const createEntity = async (dirName: string) => {
-    // Check if the "Equatable" feature is enabled for the entity.
-    const isEntityWithEquatable = vscode.workspace.getConfiguration().get<boolean>(settingsEntityWithEquatable, true);
+    try {
 
-    // If Equatable is enabled, check for the availability of the corresponding configuration.
-    if (isEntityWithEquatable) {
-        checkAvailableConfigInFolder(dirName, configEntityWithEquatable);
-    } else {
-        // Otherwise, check the standard configuration.
-        checkAvailableConfigInFolder(dirName, configEntity);
+        return await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: "Creating entity",
+            cancellable: false
+        }, async (progress) => {
+            progress.report({ message: "Checking configuration..." });
+
+            // Check if the "Equatable" feature is enabled for the entity.
+            const isEntityWithEquatable = vscode.workspace.getConfiguration().get<boolean>(settingsEntityWithEquatable, true);
+
+            // Select appropriate configuration and check its availability
+            const currentConfig = isEntityWithEquatable ? configEntityWithEquatable : configEntity;
+            await checkAvailableConfigInFolder(dirName, currentConfig);
+
+            // Get the active text editor.
+            const editor = vscode.window.activeTextEditor;
+            if (!editor) {
+                vscode.window.showInformationMessage("No active editor found. Please open a file first.");
+                return;
+            }
+
+            progress.report({ message: "Reading template..." });
+
+            // Get the file path of the current document.
+            const filePath = editor.document.fileName;
+
+            // Read the JSON template for code generation.
+            const template = await readTemplateJson(currentConfig);
+            if (!template) {
+                vscode.window.showErrorMessage(`Failed to load entity template from ${currentConfig}`);
+                return;
+            }
+
+            progress.report({ message: "Generating code..." });
+
+            // Extract the file name from the file path.
+            const fileName = filePath.split(/[/\\]/).pop() ?? '';
+
+            // Convert the file name to a class name (PascalCase).
+            const className = fileName.replace('.dart', '');
+            const normalizedClassName = convertPathToPascalCase(className);
+
+            // Generate class code based on the template.
+            const generatedCode = generateClass(template, normalizedClassName);
+
+            // Define the position to insert the code (start of the file).
+            const firstLine = new vscode.Position(0, 0);
+
+            progress.report({ message: "Updating file..." });
+
+            // Insert the generated code into the editor.
+            await editor.edit(editBuilder => {
+                editBuilder.insert(firstLine, generatedCode);
+            });
+
+            vscode.window.showInformationMessage(`Entity ${normalizedClassName} created successfully.`);
+        });
+    } catch (error) {
+        console.error('Error creating entity:', error);
+        vscode.window.showErrorMessage(`Error creating entity: ${error instanceof Error ? error.message : String(error)}`);
     }
-
-    // Determine which configuration to use.
-    const currentConfig = isEntityWithEquatable ? configEntityWithEquatable : configEntity;
-
-    // Get the active text editor.
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) {
-        // Exit the function if no editor is active.
-        return;
-    }
-
-    // Get the file path of the current document.
-    const filePath = editor.document.fileName;
-
-    // Read the JSON template for code generation.
-    const template = await readTemplateJson(currentConfig);
-
-    // Extract the file name from the file path.
-    const fileName = filePath.split('/').pop() ?? '';
-
-    // Convert the file name to a class name (PascalCase).
-    const className = fileName.replace('.dart', '');
-    const normalizedClassName = convertPathToPascalCase(className);
-
-    // Generate class code based on the template.
-    const generatedCode = generateClass(template, normalizedClassName);
-
-    // Define the position to insert the code (start of the file).
-    const firstLine = new vscode.Position(0, 0);
-
-    // Insert the generated code into the editor.
-    editor.edit(editBuilder => {
-        editBuilder.insert(firstLine, generatedCode);
-    });
 };
 
 

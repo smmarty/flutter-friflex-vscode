@@ -2,7 +2,7 @@
   "name": "flutter-friflex",
   "displayName": "Flutter Friflex",
   "description": "A plugin for Flutter developers at Friflex, an IT company",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "friflex",
   "engines": {
     "vscode": "^1.96.0"
@@ -62,6 +62,36 @@
       {
         "command": "extension.createStatefulWidget",
         "title": "Create StatefulWidget"
+      },
+      {
+        "command": "extension.addClassComments",
+        "title": "Add Comments"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "extension.createEntity",
+        "key": "ctrl+shift+1",
+        "mac": "cmd+shift+1",
+        "when": "editorTextFocus && resourceExtname == .dart"
+      },
+      {
+        "command": "extension.createStatelessWidget",
+        "key": "ctrl+shift+2",
+        "mac": "cmd+shift+2",
+        "when": "editorTextFocus && resourceExtname == .dart"
+      },
+      {
+        "command": "extension.createStatefulWidget",
+        "key": "ctrl+shift+3",
+        "mac": "cmd+shift+3",
+        "when": "editorTextFocus && resourceExtname == .dart"
+      },
+      {
+        "command": "extension.addClassComments",
+        "key": "ctrl+shift+4",
+        "mac": "cmd+shift+4",
+        "when": "editorTextFocus && resourceExtname == .dart"
       }
     ],
     "submenus": [
@@ -98,6 +128,10 @@
         {
           "command": "extension.createStatefulWidget",
           "group": "ext@3"
+        },
+        {
+          "command": "extension.addClassComments",
+          "group": "ext@4"
         }
       ]
     }
